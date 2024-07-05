@@ -1,0 +1,72 @@
+import java.util.*;
+import java.sql.*;
+public class Main {
+    //DataBase Section
+    static final String DB_URL="jdbc:mysql://localhost:3306/mydb"; //mydb---Database Name
+    static final String User_Name="root";
+    static final String Pass_word="Pranesh@2002";
+    static final String Queries_SQL="Select Stud_ID, Stud_Name, Stud_Dept From Stud_Det"; //limit 3";
+    static final String Insert_SQL="INSERT INTO Stud_Det (Stud_ID, Stud_Name, Stud_Dept) VALUES (?, ?, ?)";
+    //Main Method
+    public static void main(String args[]) {
+        Scanner sc=new Scanner(System.in);
+        //Db Connection
+        System.out.println("Database Connection");
+        try {
+            //Class.forName("com.mysql.cj.jdbc.Driver");
+            //Connect to DB
+            Connection conn = DriverManager.getConnection(DB_URL, User_Name, Pass_word);//Connected
+            System.out.println("<--DataBase Connected Successfully-->");
+            while (true){
+                System.out.println("1.Enter student details");
+                System.out.println("2.View student details");
+                System.out.println("3.Exit");
+                System.out.println("Enter Your choice: ");
+                int choice=sc.nextInt();
+                switch(choice) {
+                    case 1:
+                        try {
+                            //Get the Values from User to be added in the table
+                            //System.out.println("Enter Student Values to be added: ");
+                            System.out.println("Enter Student ID:");
+                            int id = sc.nextInt();
+                            sc.nextLine();
+                            System.out.println("Enter Student Name:");
+                            String name = sc.nextLine();
+                            System.out.println("Enter Student Dept:");
+                            String dept = sc.nextLine();
+                            //Insert Values to Table
+                            PreparedStatement pstmt = conn.prepareStatement(Insert_SQL);
+                            pstmt.setInt(1, id);
+                            pstmt.setString(2, name);
+                            pstmt.setString(3, dept);
+                            pstmt.executeUpdate();
+                            System.out.println("Added Successfully");
+                            continue;
+                        } catch (Exception e) {
+                            System.out.println("Error occured While Adding values");
+                            continue;
+                        }
+                    case 2:
+                        //Select Query to view values
+                        Statement stmt = conn.createStatement();
+                        ResultSet rs = stmt.executeQuery(Queries_SQL);
+                        //To get Values one by one
+                        while (rs.next()) {
+                            System.out.print("Student ID : " + rs.getInt("Stud_ID"));
+                            System.out.print(", Student Name : " + rs.getString("Stud_Name"));
+                            System.out.println(", Student Department : " + rs.getString("Stud_Dept"));
+                        }
+                        continue;
+                    case 3:
+                        System.exit(0);
+                }
+            }
+
+        }
+        catch (SQLException e) {
+            System.out.println("Error While Connecting to DB");
+            e.printStackTrace();
+        }
+    }
+}
